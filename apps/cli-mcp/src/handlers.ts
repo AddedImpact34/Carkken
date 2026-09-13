@@ -24,6 +24,7 @@ function client() {
     baseUrl: process.env.BRICKKEN_BASE_URL || "https://api.sandbox.brickken.com",
     wallet,
     chainId: process.env.CHAIN_ID || "aa36a7",
+    mock: process.env.MOCK_MODE === "true",
   });
 }
 

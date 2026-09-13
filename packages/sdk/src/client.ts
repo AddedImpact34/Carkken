@@ -5,6 +5,7 @@ export interface BrickkenClientConfig {
   baseUrl: string;
   wallet: Wallet;
   chainId: string; // hex, e.g. "aa36a7" for Sepolia
+  mock?: boolean; // simulate the sandbox locally, no network calls
 }
 
 export interface PreparedTx {
@@ -13,11 +14,15 @@ export interface PreparedTx {
   info?: Record<string, unknown>;
 }
 
+function fakeHash() {
+  return "0x" + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
+}
+
 /**
  * Thin wrapper around Brickken's prepare -> sign -> send -> poll lifecycle.
  * This is the ONLY place in the codebase that talks to Brickken directly.
- * Everything else (vehicle.ts, agent.ts, CLI, API, agent process) calls
- * through here so behavior stays consistent across every surface.
+ * Set config.mock = true (or MOCK_MODE=true in .env) to simulate the whole
+ * loop locally before a real sandbox key exists.
  */
 export class BrickkenClient {
   constructor(private cfg: BrickkenClientConfig) {}
@@ -30,8 +35,15 @@ export class BrickkenClient {
     };
   }
 
-  /** POST /prepare-transactions */
   async prepare(method: string, body: Record<string, unknown>): Promise<PreparedTx> {
+    if (this.cfg.mock) {
+      return {
+        txId: fakeHash(),
+        transactions: [{ mock: true, method, ...body }],
+        info: { method, mock: true },
+      };
+    }
+
     const res = await fetch(`${this.cfg.baseUrl}/prepare-transactions`, {
       method: "POST",
       headers: this.headers(),
@@ -39,24 +51,23 @@ export class BrickkenClient {
     });
 
     if (res.status === 402) {
-      // x402-eligible agentic method: caller should re-invoke with a
-      // signed payment header. See client.prepareWithPayment().
       const requirements = await res.json();
       throw new X402PaymentRequiredError(requirements);
     }
-
     if (!res.ok) {
       throw new Error(`prepare-transactions failed (${res.status}): ${await res.text()}`);
     }
     return res.json() as Promise<PreparedTx>;
   }
 
-  /** Re-issue a prepare call with an X-Payment header after a 402. */
   async prepareWithPayment(
     method: string,
     body: Record<string, unknown>,
     xPaymentHeader: string
   ): Promise<PreparedTx> {
+    if (this.cfg.mock) {
+      return { txId: fakeHash(), transactions: [{ mock: true, method, paid: true, ...body }] };
+    }
     const res = await fetch(`${this.cfg.baseUrl}/prepare-transactions`, {
       method: "POST",
       headers: this.headers({ "X-Payment": xPaymentHeader }),
@@ -68,15 +79,15 @@ export class BrickkenClient {
     return res.json() as Promise<PreparedTx>;
   }
 
-  /** Sign every prepared transaction with the configured wallet. */
   async signAll(prepared: PreparedTx): Promise<string[]> {
+    if (this.cfg.mock) return prepared.transactions.map(() => fakeHash());
     return Promise.all(
       prepared.transactions.map((tx) => this.cfg.wallet.signTransaction(tx as any))
     );
   }
 
-  /** POST /send-transactions */
   async send(txId: string, signedTransactions: string[]): Promise<{ txId: string }> {
+    if (this.cfg.mock) return { txId };
     const res = await fetch(`${this.cfg.baseUrl}/send-transactions`, {
       method: "POST",
       headers: this.headers(),
@@ -88,8 +99,9 @@ export class BrickkenClient {
     return res.json() as Promise<{ txId: string }>;
   }
 
-  /** GET /get-transaction-status?txId=... — polls until mined or timeout. */
   async pollStatus(txId: string, { intervalMs = 4000, timeoutMs = 120000 } = {}) {
+    if (this.cfg.mock) return { status: "confirmed", txHash: fakeHash(), txId };
+
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       const res = await fetch(
@@ -103,7 +115,6 @@ export class BrickkenClient {
     throw new Error(`Timed out waiting for txId ${txId} to confirm`);
   }
 
-  /** Convenience: prepare -> sign -> send -> poll in one call. */
   async runMethod(method: string, body: Record<string, unknown>) {
     const prepared = await this.prepare(method, body);
     const signed = await this.signAll(prepared);

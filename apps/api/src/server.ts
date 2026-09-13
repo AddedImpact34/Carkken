@@ -5,9 +5,12 @@ import { VehicleStatus, Vehicle } from "@carkken/sdk";
 const app = express();
 app.use(express.json());
 
-// In-memory store for the scaffold. Swap for a real DB once the sandbox
-// lifecycle calls are wired in (see docs/PROJECT_BRIEF.md section 3).
-const vehicles: Vehicle[] = [];
+const vehicles: Vehicle[] = [
+  { tokenSymbol: "TESLA", name: "Tesla Model 3", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.OFFERING_LIVE, ratePerHour: "5" },
+  { tokenSymbol: "COROL", name: "Toyota Corolla", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.LISTED_FOR_RENT, ratePerHour: "2" },
+  { tokenSymbol: "TRANS", name: "Ford Transit", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.BOOKED, ratePerHour: "4" },
+  { tokenSymbol: "BMWX", name: "BMW X5", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.TOKENIZED, ratePerHour: "6" },
+];
 
 app.get("/vehicles", (req, res) => {
   const { status } = req.query;
@@ -15,33 +18,22 @@ app.get("/vehicles", (req, res) => {
   res.json(filtered);
 });
 
-// 1. Investment marketplace: vehicles with a live STO
 app.get("/marketplace/invest", (_req, res) => {
   res.json(vehicles.filter((v) => v.status === VehicleStatus.OFFERING_LIVE));
 });
 
-// 2. Rental marketplace: vehicles available to book
 app.get("/marketplace/rent", (_req, res) => {
   res.json(vehicles.filter((v) => v.status === VehicleStatus.LISTED_FOR_RENT));
 });
 
-// 3. Live bookings: vehicles currently out on rent
 app.get("/bookings/active", (_req, res) => {
   res.json(vehicles.filter((v) => v.status === VehicleStatus.BOOKED));
 });
 
-// 4. Fleet performance: dividend history per vehicle (stubbed for now —
-// backed by GET /get-dividend-distribution once wired to the SDK)
 app.get("/fleet/performance", (_req, res) => {
   res.json(vehicles.map((v) => ({ tokenSymbol: v.tokenSymbol, dividends: [] })));
 });
 
-/**
- * x402-gated booking endpoint: a renter agent hits this without payment,
- * gets a 402 with the price/asset/chain, pays, and retries with proof.
- * This is our OWN x402 surface (separate from any x402 calls the fleet
- * agent makes back to Brickken's agentic methods).
- */
 app.post("/vehicles/:tokenSymbol/book", (req, res) => {
   const paymentProof = req.header("X-Payment");
   const vehicle = vehicles.find((v) => v.tokenSymbol === req.params.tokenSymbol);
@@ -49,7 +41,6 @@ app.post("/vehicles/:tokenSymbol/book", (req, res) => {
   if (!vehicle || vehicle.status !== VehicleStatus.LISTED_FOR_RENT) {
     return res.status(404).json({ error: "Vehicle not available for rent" });
   }
-
   if (!paymentProof) {
     return res.status(402).json({
       amount: vehicle.ratePerHour,
@@ -58,8 +49,6 @@ app.post("/vehicles/:tokenSymbol/book", (req, res) => {
       payTo: process.env.SIGNER_ADDRESS,
     });
   }
-
-  // TODO: verify paymentProof against the facilitator before confirming.
   vehicle.status = VehicleStatus.BOOKED;
   res.json({ ok: true, vehicle });
 });
