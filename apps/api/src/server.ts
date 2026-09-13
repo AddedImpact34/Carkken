@@ -1,9 +1,11 @@
 import "@carkken/sdk/dist/env";
 import express from "express";
+import * as path from "path";
 import { VehicleStatus, Vehicle } from "@carkken/sdk";
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "..", "public")));
 
 const vehicles: Vehicle[] = [
   { tokenSymbol: "TESLA", name: "Tesla Model 3", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.OFFERING_LIVE, ratePerHour: "5" },

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Carkken fleet ledger</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Text:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EDEBE2;
+    --ink: #1E2A38;
+    --amber: #D98F2B;
+    --moss: #5C7A5E;
+    --rust: #B4402F;
+    --hairline: #C9C4B8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", sans-serif;
+    line-height: 1.5;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  h1 {
+    font-family: "Big Shoulders Text", sans-serif;
+    font-weight: 600;
+    font-size: 40px;
+    margin: 0 0 8px;
+    letter-spacing: 0.2px;
+  }
+  p.lede {
+    margin: 0 0 40px;
+    color: #55606C;
+    max-width: 46ch;
+  }
+  section { margin-bottom: 40px; }
+  h2 {
+    font-family: "Big Shoulders Text", sans-serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0 0 4px;
+  }
+  p.sub {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: #55606C;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  th {
+    text-align: left;
+    font-weight: 500;
+    padding: 8px 12px 8px 0;
+    border-bottom: 1px solid var(--ink);
+    font-size: 13px;
+    color: #55606C;
+  }
+  td {
+    padding: 12px 12px 12px 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  tr:last-child td { border-bottom: none; }
+  .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .dot.invest { background: var(--amber); }
+  .dot.rent { background: var(--moss); }
+  .dot.booked { background: var(--rust); }
+  .empty {
+    padding: 16px 0;
+    color: #55606C;
+    font-size: 14px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .refresh {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: 14px;
+    background: none;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 40px;
+  }
+  .refresh:hover { background: var(--ink); color: var(--paper); }
+  .refresh:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Fleet ledger</h1>
+  <p class="lede">Every car in the fleet, and what it is doing right now.</p>
+
+  <button class="refresh" onclick="loadAll()">Refresh</button>
+
+  <section>
+    <h2>Open for investment</h2>
+    <p class="sub">Fractions still available on the offering.</p>
+    <table>
+      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
+      <tbody id="invest-rows"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Available to rent</h2>
+    <p class="sub">Fully funded and listed by the fleet agent.</p>
+    <table>
+      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
+      <tbody id="rent-rows"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Currently booked</h2>
+    <p class="sub">Out on rent right now.</p>
+    <table>
+      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
+      <tbody id="booked-rows"></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Fleet earnings</h2>
+    <p class="sub">Dividends paid out to token holders, per vehicle.</p>
+    <table>
+      <thead><tr><th>Vehicle</th><th>Payouts</th></tr></thead>
+      <tbody id="earnings-rows"></tbody>
+    </table>
+  </section>
+</main>
+
+<script>
+async function loadAll() {
+  const [invest, rent, booked, earnings] = await Promise.all([
+    fetch("/marketplace/invest").then(r => r.json()),
+    fetch("/marketplace/rent").then(r => r.json()),
+    fetch("/bookings/active").then(r => r.json()),
+    fetch("/fleet/performance").then(r => r.json()),
+  ]);
+
+  fillTable("invest-rows", invest, "invest", v =>
+    `<td><span class="dot invest"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
+  );
+  fillTable("rent-rows", rent, "rent", v =>
+    `<td><span class="dot rent"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
+  );
+  fillTable("booked-rows", booked, "booked", v =>
+    `<td><span class="dot booked"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
+  );
+
+  const earningsBody = document.getElementById("earnings-rows");
+  earningsBody.innerHTML = "";
+  const withPayouts = earnings.filter(e => e.dividends && e.dividends.length);
+  if (withPayouts.length === 0) {
+    earningsBody.innerHTML = `<tr><td colspan="2" class="empty">No payouts yet. They will show up here once a booked vehicle settles rental revenue back to its token holders.</td></tr>`;
+  } else {
+    withPayouts.forEach(e => {
+      const row = document.createElement("tr");
+      row.innerHTML = `<td>${e.tokenSymbol}</td><td>${e.dividends.length} payout(s)</td>`;
+      earningsBody.appendChild(row);
+    });
+  }
+}
+
+function fillTable(id, rows, kind, renderRow) {
+  const body = document.getElementById(id);
+  body.innerHTML = "";
+  if (rows.length === 0) {
+    const label = kind === "invest" ? "No offerings open right now."
+      : kind === "rent" ? "No vehicles listed for rent right now."
+      : "No vehicles booked right now.";
+    body.innerHTML = `<tr><td colspan="3" class="empty">${label}</td></tr>`;
+    return;
+  }
+  rows.forEach(v => {
+    const row = document.createElement("tr");
+    row.innerHTML = renderRow(v);
+    body.appendChild(row);
+  });
+}
+
+loadAll();
+</script>
+</body>
+</html>
