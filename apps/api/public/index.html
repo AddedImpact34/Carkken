@@ -2,152 +2,237 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Carkken fleet ledger</title>
+<title>Carkken</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Text:wght@500;600&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --paper: #EDEBE2;
-    --ink: #1E2A38;
-    --amber: #D98F2B;
-    --moss: #5C7A5E;
-    --rust: #B4402F;
-    --hairline: #C9C4B8;
+    --navy: #14213D;
+    --line: #1E2A44;
+    --paper: #F7F7F5;
+    --panel: #FFFFFF;
+    --amber: #E0932A;
+    --emerald: #2E9E63;
+    --coral: #E8613F;
+    --violet: #6C4FE0;
+    --ink: #14213D;
+    --muted: #6B7280;
+    --hairline: #E2E4E8;
   }
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: "IBM Plex Sans", sans-serif;
-    line-height: 1.5;
-  }
-  main {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 48px 24px 80px;
-  }
-  h1 {
-    font-family: "Big Shoulders Text", sans-serif;
-    font-weight: 600;
-    font-size: 40px;
-    margin: 0 0 8px;
-    letter-spacing: 0.2px;
-  }
-  p.lede {
-    margin: 0 0 40px;
-    color: #55606C;
-    max-width: 46ch;
-  }
-  section { margin-bottom: 40px; }
-  h2 {
-    font-family: "Big Shoulders Text", sans-serif;
-    font-weight: 500;
-    font-size: 22px;
-    margin: 0 0 4px;
-  }
-  p.sub {
-    margin: 0 0 16px;
-    font-size: 14px;
-    color: #55606C;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 15px;
-  }
-  th {
-    text-align: left;
-    font-weight: 500;
-    padding: 8px 12px 8px 0;
-    border-bottom: 1px solid var(--ink);
-    font-size: 13px;
-    color: #55606C;
-  }
-  td {
-    padding: 12px 12px 12px 0;
-    border-bottom: 1px solid var(--hairline);
-  }
-  tr:last-child td { border-bottom: none; }
-  .dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 8px;
-    vertical-align: middle;
-  }
-  .dot.invest { background: var(--amber); }
-  .dot.rent { background: var(--moss); }
-  .dot.booked { background: var(--rust); }
-  .empty {
-    padding: 16px 0;
-    color: #55606C;
-    font-size: 14px;
-    border-bottom: 1px solid var(--hairline);
-  }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Inter", sans-serif; }
+  .mono { font-family: "IBM Plex Mono", monospace; }
+
+  .hero { background: var(--navy); color: white; padding: 72px 24px 56px; }
+  .hero-inner { max-width: 1080px; margin: 0 auto; }
+  .wordmark { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(40px, 6vw, 64px); margin: 0; letter-spacing: -1px; }
+  .tagline { font-size: 17px; color: #AEB6CC; max-width: 52ch; margin: 12px 0 0; }
   .refresh {
-    font-family: "IBM Plex Sans", sans-serif;
-    font-size: 14px;
-    background: none;
-    border: 1px solid var(--ink);
-    color: var(--ink);
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 40px;
+    font-family: "Inter", sans-serif; font-weight: 600; font-size: 14px;
+    background: transparent; color: white; border: 1px solid #3C4A6B;
+    padding: 11px 22px; border-radius: 8px; cursor: pointer; margin: 28px 0 48px;
   }
-  .refresh:hover { background: var(--ink); color: var(--paper); }
+  .refresh:hover { border-color: white; }
   .refresh:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .hero-fleet { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .hero-fleet .mount { width: 220px; }
+
+  main { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  section.floor { padding: 64px 0; border-bottom: 1px solid var(--hairline); }
+  section.floor:last-of-type { border-bottom: none; }
+
+  .floor-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .floor-title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 26px; margin: 0; }
+  .floor-sub { color: var(--muted); font-size: 14px; margin: 2px 0 24px; }
+
+  .pill { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 999px; color: white; white-space: nowrap; }
+  .pill.invest { background: var(--amber); }
+  .pill.rent { background: var(--emerald); }
+  .pill.booked { background: var(--coral); }
+  .live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: white; margin-right: 6px; animation: pulse 1.6s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
+
+  .spread {
+    display: grid; grid-template-columns: 1.1fr 1fr; gap: 40px; align-items: center;
+    background: var(--panel); border-radius: 20px; padding: 32px;
+    box-shadow: 0 1px 2px rgba(20,33,61,0.04), 0 12px 32px rgba(20,33,61,0.06);
+    margin-bottom: 24px;
+  }
+  .spread:last-child { margin-bottom: 0; }
+  @media (max-width: 720px) { .spread { grid-template-columns: 1fr; } }
+
+  .stage {
+    position: relative;
+    background:
+      radial-gradient(circle, #D7DCE5 1px, transparent 1px) 0 0 / 16px 16px,
+      #FBFBFA;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    padding: 28px 16px 40px;
+  }
+  .stage svg { width: 100%; max-width: 300px; display: block; margin: 0 auto; }
+
+  .crop { position: absolute; width: 14px; height: 14px; border-color: #AEB6C4; }
+  .crop.tl { top: 6px; left: 6px; border-top: 1.5px solid; border-left: 1.5px solid; }
+  .crop.tr { top: 6px; right: 6px; border-top: 1.5px solid; border-right: 1.5px solid; }
+  .crop.bl { bottom: 6px; left: 6px; border-bottom: 1.5px solid; border-left: 1.5px solid; }
+  .crop.br { bottom: 6px; right: 6px; border-bottom: 1.5px solid; border-right: 1.5px solid; }
+
+  .titleblock {
+    position: absolute; bottom: 10px; left: 22px;
+    font-size: 10px; line-height: 1.5; color: #7B8494;
+    text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .titleblock .unit { color: var(--line); font-weight: 500; }
+
+  .info .type { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .info h3 { font-family: "Space Grotesk", sans-serif; font-size: 24px; margin: 0 0 16px; }
+  .specs { border-top: 1px solid var(--hairline); }
+  .specs .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-size: 14px; }
+  .specs .row span:first-child { color: var(--muted); }
+  .rate { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 18px; }
+
+  .earnings-row { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; background: var(--panel); border-radius: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(20,33,61,0.04); }
+  .earnings-row .name { font-weight: 600; }
+  .earnings-row .count { color: var(--muted); font-size: 14px; }
+
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); background: var(--panel); border-radius: 18px; }
+  .empty-state svg { width: 72px; margin-bottom: 14px; }
+  .empty-state p { max-width: 42ch; margin: 0 auto; font-size: 14px; }
 </style>
 </head>
 <body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1 class="wordmark">Carkken</h1>
+    <p class="tagline">Fractional car ownership, run by a fleet agent that only acts inside the limits its owners set.</p>
+    <button class="refresh" onclick="loadAll()">Refresh the fleet</button>
+    <div class="hero-fleet" id="hero-fleet"></div>
+  </div>
+</div>
+
 <main>
-  <h1>Fleet ledger</h1>
-  <p class="lede">Every car in the fleet, and what it is doing right now.</p>
-
-  <button class="refresh" onclick="loadAll()">Refresh</button>
-
-  <section>
-    <h2>Open for investment</h2>
-    <p class="sub">Fractions still available on the offering.</p>
-    <table>
-      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
-      <tbody id="invest-rows"></tbody>
-    </table>
+  <section class="floor">
+    <div class="floor-head">
+      <h2 class="floor-title">Open for investment</h2>
+      <span class="pill invest">Funding open</span>
+    </div>
+    <p class="floor-sub">Buy a slice before the offering closes.</p>
+    <div id="invest-cards"></div>
   </section>
 
-  <section>
-    <h2>Available to rent</h2>
-    <p class="sub">Fully funded and listed by the fleet agent.</p>
-    <table>
-      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
-      <tbody id="rent-rows"></tbody>
-    </table>
+  <section class="floor">
+    <div class="floor-head">
+      <h2 class="floor-title">Available to rent</h2>
+      <span class="pill rent">Ready to book</span>
+    </div>
+    <p class="floor-sub">Fully funded and ready to drive.</p>
+    <div id="rent-cards"></div>
   </section>
 
-  <section>
-    <h2>Currently booked</h2>
-    <p class="sub">Out on rent right now.</p>
-    <table>
-      <thead><tr><th>Vehicle</th><th>Token</th><th>Rate</th></tr></thead>
-      <tbody id="booked-rows"></tbody>
-    </table>
+  <section class="floor">
+    <div class="floor-head">
+      <h2 class="floor-title">Currently booked</h2>
+      <span class="pill booked"><span class="live-dot"></span>Live</span>
+    </div>
+    <p class="floor-sub">Out on the road right now.</p>
+    <div id="booked-cards"></div>
   </section>
 
-  <section>
-    <h2>Fleet earnings</h2>
-    <p class="sub">Dividends paid out to token holders, per vehicle.</p>
-    <table>
-      <thead><tr><th>Vehicle</th><th>Payouts</th></tr></thead>
-      <tbody id="earnings-rows"></tbody>
-    </table>
+  <section class="floor">
+    <div class="floor-head">
+      <h2 class="floor-title">Fleet earnings</h2>
+    </div>
+    <p class="floor-sub">What each car has paid its owners.</p>
+    <div id="earnings-body"></div>
   </section>
 </main>
 
 <script>
+// Technical line-drawing cars: single-weight stroke, no fill, dimension line
+// beneath, like a registration or patent drawing. Deliberately generic
+// shapes, not modeled on any specific manufacturer's design.
+
+function wheelLine(cx, cy, stroke) {
+  return `
+    <circle cx="${cx}" cy="${cy}" r="15" fill="none" stroke="${stroke}" stroke-width="2"/>
+    <circle cx="${cx}" cy="${cy}" r="4" fill="none" stroke="${stroke}" stroke-width="1.4"/>
+  `;
+}
+
+function dimensionLine(x1, x2, y, stroke) {
+  return `
+    <line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="${stroke}" stroke-width="1" opacity="0.6"/>
+    <line x1="${x1}" y1="${y-4}" x2="${x1}" y2="${y+4}" stroke="${stroke}" stroke-width="1" opacity="0.6"/>
+    <line x1="${x2}" y1="${y-4}" x2="${x2}" y2="${y+4}" stroke="${stroke}" stroke-width="1" opacity="0.6"/>
+  `;
+}
+
+function carLine(kind, stroke) {
+  const ground = `<line x1="14" y1="108" x2="286" y2="108" stroke="${stroke}" stroke-width="1" opacity="0.35"/>`;
+  const dim = dimensionLine(30, 270, 126, stroke);
+
+  if (kind === "sedan") {
+    return `<svg viewBox="0 0 300 136" xmlns="http://www.w3.org/2000/svg">
+      ${ground}
+      <path d="M22,88 Q20,62 46,58 L72,32 Q84,22 106,22 L186,22 Q206,22 218,36 L246,58 Q276,60 276,88 L276,96 L24,96 Z" fill="none" stroke="${stroke}" stroke-width="2"/>
+      <path d="M80,56 L100,34 L194,34 L220,56" fill="none" stroke="${stroke}" stroke-width="1.4"/>
+      <line x1="150" y1="34" x2="150" y2="56" stroke="${stroke}" stroke-width="1"/>
+      <line x1="60" y1="80" x2="240" y2="80" stroke="${stroke}" stroke-width="1" opacity="0.5"/>
+      ${wheelLine(74, 108, stroke)}
+      ${wheelLine(222, 108, stroke)}
+      ${dim}
+    </svg>`;
+  }
+
+  if (kind === "van") {
+    return `<svg viewBox="0 0 300 136" xmlns="http://www.w3.org/2000/svg">
+      ${ground}
+      <path d="M26,92 L26,44 Q26,24 48,24 L250,24 Q270,24 270,44 L270,96 L24,96 Z" fill="none" stroke="${stroke}" stroke-width="2"/>
+      <path d="M36,32 L84,32 L84,64 L36,64 Z" fill="none" stroke="${stroke}" stroke-width="1.4"/>
+      <path d="M96,32 L258,32 L258,64 L96,64 Z" fill="none" stroke="${stroke}" stroke-width="1.4"/>
+      <line x1="176" y1="32" x2="176" y2="64" stroke="${stroke}" stroke-width="1"/>
+      ${wheelLine(74, 108, stroke)}
+      ${wheelLine(228, 108, stroke)}
+      ${dim}
+    </svg>`;
+  }
+
+  // suv
+  return `<svg viewBox="0 0 300 136" xmlns="http://www.w3.org/2000/svg">
+    ${ground}
+    <path d="M20,90 Q18,60 46,56 L68,30 Q80,20 104,20 L192,20 Q212,20 224,34 L250,56 Q282,58 282,90 L282,96 L22,96 Z" fill="none" stroke="${stroke}" stroke-width="2"/>
+    <path d="M78,54 L98,32 L198,32 L224,54" fill="none" stroke="${stroke}" stroke-width="1.4"/>
+    <line x1="150" y1="32" x2="150" y2="54" stroke="${stroke}" stroke-width="1"/>
+    <line x1="94" y1="19" x2="204" y2="19" stroke="${stroke}" stroke-width="1.6"/>
+    ${wheelLine(76, 108, stroke)}
+    ${wheelLine(228, 108, stroke)}
+    ${dim}
+  </svg>`;
+}
+
+const VEHICLE_STYLE = {
+  TESLA: { kind: "sedan", type: "sedan" },
+  COROL: { kind: "sedan", type: "sedan" },
+  TRANS: { kind: "van",   type: "van" },
+  BMWX:  { kind: "suv",   type: "suv" },
+};
+
+function heroArt(tokenSymbol) {
+  const style = VEHICLE_STYLE[tokenSymbol] || { kind: "sedan" };
+  return carLine(style.kind, "#CBD8EE");
+}
+
+function stageArt(tokenSymbol) {
+  const style = VEHICLE_STYLE[tokenSymbol] || { kind: "sedan" };
+  return carLine(style.kind, "#1E2A44");
+}
+
 async function loadAll() {
   const [invest, rent, booked, earnings] = await Promise.all([
     fetch("/marketplace/invest").then(r => r.json()),
@@ -156,45 +241,65 @@ async function loadAll() {
     fetch("/fleet/performance").then(r => r.json()),
   ]);
 
-  fillTable("invest-rows", invest, "invest", v =>
-    `<td><span class="dot invest"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
-  );
-  fillTable("rent-rows", rent, "rent", v =>
-    `<td><span class="dot rent"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
-  );
-  fillTable("booked-rows", booked, "booked", v =>
-    `<td><span class="dot booked"></span>${v.name}</td><td>${v.tokenSymbol}</td><td>$${v.ratePerHour}/hr</td>`
-  );
-
-  const earningsBody = document.getElementById("earnings-rows");
-  earningsBody.innerHTML = "";
-  const withPayouts = earnings.filter(e => e.dividends && e.dividends.length);
-  if (withPayouts.length === 0) {
-    earningsBody.innerHTML = `<tr><td colspan="2" class="empty">No payouts yet. They will show up here once a booked vehicle settles rental revenue back to its token holders.</td></tr>`;
-  } else {
-    withPayouts.forEach(e => {
-      const row = document.createElement("tr");
-      row.innerHTML = `<td>${e.tokenSymbol}</td><td>${e.dividends.length} payout(s)</td>`;
-      earningsBody.appendChild(row);
-    });
-  }
+  renderFleetStrip([...invest, ...rent, ...booked]);
+  renderSpread("invest-cards", invest, "No offerings open right now.");
+  renderSpread("rent-cards", rent, "No vehicles listed for rent right now.");
+  renderSpread("booked-cards", booked, "No vehicles booked right now.");
+  renderEarnings(earnings);
 }
 
-function fillTable(id, rows, kind, renderRow) {
-  const body = document.getElementById(id);
-  body.innerHTML = "";
+function renderFleetStrip(vehicles) {
+  document.getElementById("hero-fleet").innerHTML =
+    vehicles.map(v => `<div class="mount">${heroArt(v.tokenSymbol)}</div>`).join("");
+}
+
+function renderSpread(id, rows, emptyMessage) {
+  const el = document.getElementById(id);
   if (rows.length === 0) {
-    const label = kind === "invest" ? "No offerings open right now."
-      : kind === "rent" ? "No vehicles listed for rent right now."
-      : "No vehicles booked right now.";
-    body.innerHTML = `<tr><td colspan="3" class="empty">${label}</td></tr>`;
+    el.innerHTML = `<div class="empty-state"><p>${emptyMessage}</p></div>`;
     return;
   }
-  rows.forEach(v => {
-    const row = document.createElement("tr");
-    row.innerHTML = renderRow(v);
-    body.appendChild(row);
-  });
+  el.innerHTML = rows.map(v => `
+    <div class="spread">
+      <div class="stage">
+        <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span><span class="crop br"></span>
+        ${stageArt(v.tokenSymbol)}
+        <div class="titleblock mono">
+          <div class="unit">${v.tokenSymbol}</div>
+          <div>${(VEHICLE_STYLE[v.tokenSymbol] || {}).type || "vehicle"}</div>
+        </div>
+      </div>
+      <div class="info">
+        <div class="type">${(VEHICLE_STYLE[v.tokenSymbol] || {}).type || "vehicle"}</div>
+        <h3>${v.name}</h3>
+        <div class="specs">
+          <div class="row"><span>Token</span><span>${v.tokenSymbol}</span></div>
+          ${v.supplyCap ? `<div class="row"><span>Shares</span><span>${v.supplyCap}</span></div>` : ""}
+          <div class="row"><span>Rate</span><span class="rate">$${v.ratePerHour}/hr</span></div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderEarnings(earnings) {
+  const el = document.getElementById("earnings-body");
+  const withPayouts = earnings.filter(e => e.dividends && e.dividends.length);
+  if (withPayouts.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 100 100"><ellipse cx="50" cy="78" rx="30" ry="8" fill="#6C4FE0" opacity="0.25"/><ellipse cx="50" cy="66" rx="30" ry="8" fill="#6C4FE0" opacity="0.4"/><ellipse cx="50" cy="54" rx="30" ry="8" fill="#6C4FE0" opacity="0.6"/><ellipse cx="50" cy="42" rx="30" ry="8" fill="#6C4FE0"/></svg>
+        <p>No payouts yet. They will show up here once a booked vehicle settles rental revenue back to its token holders.</p>
+      </div>
+    `;
+    return;
+  }
+  el.innerHTML = withPayouts.map(e => `
+    <div class="earnings-row">
+      <span class="name">${e.tokenSymbol}</span>
+      <span class="count">${e.dividends.length} payout(s)</span>
+    </div>
+  `).join("");
 }
 
 loadAll();
