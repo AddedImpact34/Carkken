@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import * as fs from "fs";
+import * as path from "path";
 import {
   handleTokenize,
   handleWhitelist,
@@ -13,8 +14,10 @@ import {
 
 const program = new Command("carkken");
 
-function readJson(path: string) {
-  return JSON.parse(fs.readFileSync(path, "utf-8"));
+function readJson(filePath: string) {
+  const base = process.env.INIT_CWD || process.cwd();
+  const fullPath = path.resolve(base, filePath);
+  return JSON.parse(fs.readFileSync(fullPath, "utf-8"));
 }
 
 program
@@ -29,7 +32,7 @@ program
 
 program
   .command("offering launch")
-  .requiredOption("--file <path>", "STO params, see docs/PROJECT_BRIEF.md")
+  .requiredOption("--file <path>", "STO settings, see docs/PROJECT_BRIEF.md")
   .action(async (opts) => console.log(await handleLaunchOffering(readJson(opts.file))));
 
 program
@@ -39,7 +42,7 @@ program
 
 program
   .command("mandate issue")
-  .requiredOption("--file <path>", "RAMS-pattern mandate, see agent.ts Mandate type")
+  .requiredOption("--file <path>", "mandate settings, see agent.ts Mandate type")
   .action(async (opts) => console.log(await handleMandateIssue(readJson(opts.file))));
 
 program

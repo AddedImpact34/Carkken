@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "@carkken/sdk/dist/env";
 import express from "express";
 import { VehicleStatus, Vehicle } from "@carkken/sdk";
 

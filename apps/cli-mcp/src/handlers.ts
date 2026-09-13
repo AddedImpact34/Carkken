@@ -1,4 +1,4 @@
-import "dotenv/config";
+import "@carkken/sdk/dist/env";
 import { Wallet } from "ethers";
 import {
   BrickkenClient,
