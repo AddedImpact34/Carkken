@@ -1,0 +1,15 @@
+{
+  "name": "carkken",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "cli": "npm run start --workspace apps/cli-mcp -- cli",
+    "mcp": "npm run start --workspace apps/cli-mcp -- mcp",
+    "api": "npm run start --workspace apps/api",
+    "agent": "npm run start --workspace apps/agent"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@carkken/cli-mcp",
+  "version": "0.1.0",
+  "bin": { "carkken": "dist/cli.js" },
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/entry.js"
+  },
+  "dependencies": {
+    "@carkken/sdk": "*",
+    "commander": "^12.1.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ethers": "^6.13.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
