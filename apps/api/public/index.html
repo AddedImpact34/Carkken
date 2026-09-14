@@ -1,3 +1,4 @@
+cat > apps/api/public/index.html << 'HTMLEOF'
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,11 +16,6 @@
     --amber: #C87A0E;
     --emerald: #1F8E56;
     --coral: #D14E2E;
-    --violet: #5B3FD1;
-    --amber-tint: #FBEEDC;
-    --emerald-tint: #E1F2E9;
-    --coral-tint: #FBE4DD;
-    --violet-tint: #EAE5FB;
     --ink: #14213D;
     --muted: #67707E;
     --hairline: #E5E7EB;
@@ -28,25 +24,28 @@
   body { margin: 0; background: var(--paper); color: var(--ink); font-family: "Inter", sans-serif; }
   .mono { font-family: "IBM Plex Mono", monospace; }
 
-  .hero { background: var(--navy); color: white; padding: 64px 24px 48px; }
-  .hero-inner { max-width: 1000px; margin: 0 auto; }
+  .hero { background: var(--navy); color: white; padding: 64px 24px 40px; }
+  .hero-inner { max-width: 1040px; margin: 0 auto; }
   .wordmark { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: clamp(38px, 5.5vw, 56px); margin: 0; letter-spacing: -0.5px; }
   .tagline { font-size: 16px; color: #AEB6CC; max-width: 54ch; margin: 12px 0 28px; }
   .refresh {
     font-family: "Inter", sans-serif; font-weight: 600; font-size: 14px;
     background: white; color: var(--navy); border: none;
-    padding: 10px 20px; border-radius: 8px; cursor: pointer;
+    padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-bottom: 32px;
   }
   .refresh:hover { background: #E7E9EE; }
   .refresh:focus-visible { outline: 2px solid white; outline-offset: 2px; }
 
-  main { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
-  section.floor { padding: 48px 0; border-bottom: 1px solid var(--hairline); }
+  .thumb-strip { display: flex; gap: 12px; }
+  .thumb-strip img { width: 88px; height: 66px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(255,255,255,0.15); }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 0 24px; }
+  section.floor { padding: 56px 0; border-bottom: 1px solid var(--hairline); }
   section.floor:last-of-type { border-bottom: none; }
 
   .floor-head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-  .floor-title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 22px; margin: 0; }
-  .floor-sub { color: var(--muted); font-size: 14px; margin: 2px 0 20px; }
+  .floor-title { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 24px; margin: 0; }
+  .floor-sub { color: var(--muted); font-size: 14px; margin: 2px 0 24px; }
 
   .pill { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 999px; color: white; white-space: nowrap; }
   .pill.invest { background: var(--amber); }
@@ -56,34 +55,30 @@
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
   @media (prefers-reduced-motion: reduce) { .live-dot { animation: none; } }
 
-  .asset-row {
-    display: flex; align-items: center; gap: 16px;
-    background: var(--panel); border-radius: 14px; padding: 16px 20px;
-    box-shadow: 0 1px 2px rgba(20,33,61,0.05);
-    margin-bottom: 10px;
+  .spread {
+    display: grid; grid-template-columns: 1.05fr 1fr; gap: 0; align-items: stretch;
+    background: var(--panel); border-radius: 20px; overflow: hidden;
+    box-shadow: 0 1px 2px rgba(20,33,61,0.05), 0 12px 28px rgba(20,33,61,0.06);
+    margin-bottom: 20px;
   }
-  .asset-row:last-child { margin-bottom: 0; }
+  .spread:last-child { margin-bottom: 0; }
+  @media (max-width: 700px) { .spread { grid-template-columns: 1fr; } }
 
-  .badge { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-  .badge.invest-bg { background: var(--amber-tint); color: var(--amber); }
-  .badge.rent-bg { background: var(--emerald-tint); color: var(--emerald); }
-  .badge.booked-bg { background: var(--coral-tint); color: var(--coral); }
-  .badge svg { width: 24px; height: 24px; }
-
-  .name-block { flex: 1 1 auto; min-width: 0; }
-  .name-block .name { font-weight: 600; font-size: 15px; }
-  .name-block .type { font-size: 12px; color: var(--muted); text-transform: capitalize; }
-
-  .stats { display: flex; gap: 28px; flex: 0 0 auto; }
-  .stat { text-align: right; }
-  .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
-  .stat .value { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 15px; }
-  .stat .value.mono-token { font-family: "IBM Plex Mono", monospace; font-weight: 500; font-size: 13px; }
-
-  @media (max-width: 560px) {
-    .stats { gap: 16px; }
-    .stat .label { display: none; }
+  .photo { position: relative; min-height: 220px; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo .credit {
+    position: absolute; bottom: 8px; right: 10px;
+    font-size: 10px; color: rgba(255,255,255,0.85);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   }
+
+  .info { padding: 28px 28px; display: flex; flex-direction: column; justify-content: center; }
+  .info .type { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .info h3 { font-family: "Space Grotesk", sans-serif; font-size: 24px; margin: 0 0 16px; }
+  .specs { border-top: 1px solid var(--hairline); }
+  .specs .row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--hairline); font-size: 14px; }
+  .specs .row span:first-child { color: var(--muted); }
+  .rate { font-family: "Space Grotesk", sans-serif; font-weight: 700; font-size: 18px; }
 
   .earnings-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: var(--panel); border-radius: 14px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(20,33,61,0.05); }
   .earnings-row .name { font-weight: 600; }
@@ -100,6 +95,7 @@
     <h1 class="wordmark">Carkken</h1>
     <p class="tagline">Fractional car ownership, run by a fleet agent that only acts inside the limits its owners set.</p>
     <button class="refresh" onclick="loadAll()">Refresh the fleet</button>
+    <div class="thumb-strip" id="hero-thumbs"></div>
   </div>
 </div>
 
@@ -141,28 +137,17 @@
 </main>
 
 <script>
-// Small universal vehicle-type glyphs, generic and not modeled on any
-// specific manufacturer's design, used the same way Uber, Turo and most
-// fleet or insurance apps mark an asset row.
-const ICONS = {
-  sedan: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11h.5A1.5 1.5 0 0 1 21 12.5V16a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1v-3.5A1.5 1.5 0 0 1 4.5 11H5z"/><circle cx="7.5" cy="17" r="1.5" fill="white"/><circle cx="16.5" cy="17" r="1.5" fill="white"/></svg>`,
-  van: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8a1 1 0 0 1 1-1h11l4 4v4.5A1.5 1.5 0 0 1 17.5 17H17a2 2 0 0 1-4 0H9a2 2 0 0 1-4 0H4a1 1 0 0 1-1-1V8z"/><circle cx="7" cy="17" r="1.6" fill="white"/><circle cx="15" cy="17" r="1.6" fill="white"/></svg>`,
-  suv: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 11l1.2-4A2 2 0 0 1 7.1 5.5h9.8a2 2 0 0 1 1.9 1.5L20 11h.3A1.7 1.7 0 0 1 22 12.7V16a1 1 0 0 1-1 1h-1a2 2 0 0 1-4 0H8a2 2 0 0 1-4 0H3a1 1 0 0 1-1-1v-3.3A1.7 1.7 0 0 1 3.7 11H4z"/><rect x="9" y="4" width="6" height="2" rx="1"/><circle cx="7" cy="17" r="1.6" fill="white"/><circle cx="17" cy="17" r="1.6" fill="white"/></svg>`,
+// Licensed photography (Unsplash License: free for commercial use, no
+// attribution required). Credit line shown anyway as good practice.
+const PHOTOS = {
+  TESLA: { url: "https://images.unsplash.com/photo-1572191267337-c1705e46645c?w=900&q=80&auto=format&fit=crop", credit: "Photo: David von Diemar", type: "sedan" },
+  COROL: { url: "https://images.unsplash.com/photo-1559385988-439b04de16f8?w=900&q=80&auto=format&fit=crop", credit: "Photo: sanjoy saha", type: "sedan" },
+  TRANS: { url: "https://images.unsplash.com/photo-1593914370442-49d414beca24?w=900&q=80&auto=format&fit=crop", credit: "Photo: Alex Guillaume", type: "van" },
+  BMWX:  { url: "https://images.unsplash.com/photo-1635990215241-4d2805d729bb?w=900&q=80&auto=format&fit=crop", credit: "Photo: Daniel Gutko", type: "suv" },
 };
 
-const VEHICLE_STYLE = {
-  TESLA: { icon: "sedan", type: "sedan" },
-  COROL: { icon: "sedan", type: "sedan" },
-  TRANS: { icon: "van",   type: "van" },
-  BMWX:  { icon: "suv",   type: "suv" },
-};
-
-function iconFor(tokenSymbol) {
-  const style = VEHICLE_STYLE[tokenSymbol] || { icon: "sedan" };
-  return ICONS[style.icon];
-}
-function typeFor(tokenSymbol) {
-  return (VEHICLE_STYLE[tokenSymbol] || {}).type || "vehicle";
+function photoFor(tokenSymbol) {
+  return PHOTOS[tokenSymbol] || { url: "", credit: "", type: "vehicle" };
 }
 
 async function loadAll() {
@@ -173,41 +158,50 @@ async function loadAll() {
     fetch("/fleet/performance").then(r => r.json()),
   ]);
 
-  renderRows("invest-cards", invest, "invest-bg", "No offerings open right now.", v => `
-    <div class="stat"><div class="label">Token</div><div class="value mono-token">${v.tokenSymbol}</div></div>
-    ${v.supplyCap ? `<div class="stat"><div class="label">Shares</div><div class="value">${v.supplyCap}</div></div>` : ""}
-    <div class="stat"><div class="label">Rate</div><div class="value">$${v.ratePerHour}/hr</div></div>
+  renderThumbs([...invest, ...rent, ...booked]);
+  renderSpread("invest-cards", invest, "No offerings open right now.", v => `
+    <div class="row"><span>Token</span><span>${v.tokenSymbol}</span></div>
+    ${v.supplyCap ? `<div class="row"><span>Shares</span><span>${v.supplyCap}</span></div>` : ""}
+    <div class="row"><span>Rate</span><span class="rate">$${v.ratePerHour}/hr</span></div>
   `);
-
-  renderRows("rent-cards", rent, "rent-bg", "No vehicles listed for rent right now.", v => `
-    <div class="stat"><div class="label">Token</div><div class="value mono-token">${v.tokenSymbol}</div></div>
-    <div class="stat"><div class="label">Rate</div><div class="value">$${v.ratePerHour}/hr</div></div>
+  renderSpread("rent-cards", rent, "No vehicles listed for rent right now.", v => `
+    <div class="row"><span>Token</span><span>${v.tokenSymbol}</span></div>
+    <div class="row"><span>Rate</span><span class="rate">$${v.ratePerHour}/hr</span></div>
   `);
-
-  renderRows("booked-cards", booked, "booked-bg", "No vehicles booked right now.", v => `
-    <div class="stat"><div class="label">Token</div><div class="value mono-token">${v.tokenSymbol}</div></div>
-    <div class="stat"><div class="label">Rate</div><div class="value">$${v.ratePerHour}/hr</div></div>
+  renderSpread("booked-cards", booked, "No vehicles booked right now.", v => `
+    <div class="row"><span>Token</span><span>${v.tokenSymbol}</span></div>
+    <div class="row"><span>Rate</span><span class="rate">$${v.ratePerHour}/hr</span></div>
   `);
-
   renderEarnings(earnings);
 }
 
-function renderRows(id, rows, badgeClass, emptyMessage, statsFn) {
+function renderThumbs(vehicles) {
+  document.getElementById("hero-thumbs").innerHTML =
+    vehicles.map(v => `<img src="${photoFor(v.tokenSymbol).url}" alt="${v.name}">`).join("");
+}
+
+function renderSpread(id, rows, emptyMessage, specsFn) {
   const el = document.getElementById(id);
   if (rows.length === 0) {
     el.innerHTML = `<div class="empty-state"><p>${emptyMessage}</p></div>`;
     return;
   }
-  el.innerHTML = rows.map(v => `
-    <div class="asset-row">
-      <div class="badge ${badgeClass}">${iconFor(v.tokenSymbol)}</div>
-      <div class="name-block">
-        <div class="name">${v.name}</div>
-        <div class="type">${typeFor(v.tokenSymbol)}</div>
+  el.innerHTML = rows.map(v => {
+    const photo = photoFor(v.tokenSymbol);
+    return `
+      <div class="spread">
+        <div class="photo">
+          <img src="${photo.url}" alt="${v.name}">
+          <span class="credit">${photo.credit}</span>
+        </div>
+        <div class="info">
+          <div class="type">${photo.type}</div>
+          <h3>${v.name}</h3>
+          <div class="specs">${specsFn(v)}</div>
+        </div>
       </div>
-      <div class="stats">${statsFn(v)}</div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
 
 function renderEarnings(earnings) {
@@ -229,3 +223,4 @@ loadAll();
 </script>
 </body>
 </html>
+HTMLEOF
