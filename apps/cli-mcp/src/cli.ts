@@ -31,22 +31,22 @@ program
   .action(async (opts) => console.log(await handleWhitelist(readJson(opts.file))));
 
 program
-  .command("offering launch")
+  .command("offering-launch")
   .requiredOption("--file <path>", "STO settings, see docs/PROJECT_BRIEF.md")
   .action(async (opts) => console.log(await handleLaunchOffering(readJson(opts.file))));
 
 program
-  .command("agent register")
+  .command("agent-register")
   .requiredOption("--file <path>", "{ name, description, image, services[] }")
   .action(async (opts) => console.log(await handleAgentRegister(readJson(opts.file))));
 
 program
-  .command("mandate issue")
+  .command("mandate-issue")
   .requiredOption("--file <path>", "mandate settings, see agent.ts Mandate type")
   .action(async (opts) => console.log(await handleMandateIssue(readJson(opts.file))));
 
 program
-  .command("rent book")
+  .command("rent-book")
   .requiredOption("--file <path>", "{ mandate, renterAgentId, amount, method }")
   .action(async (opts) => console.log(await handleRentBook(readJson(opts.file))));
 

@@ -1,0 +1,13 @@
+{
+  "tokenizerEmail": "addedimpact.org@gmail.com",
+  "tokenSymbol": "CKCOR",
+  "tokenAmount": "1000",
+  "offeringName": "Corolla Series A",
+  "startDate": "2026-09-14T00:00:00.000Z",
+  "endDate": "2026-12-31T23:59:59.000Z",
+  "acceptedCoin": "USDT",
+  "minRaiseUSD": "500",
+  "maxRaiseUSD": "5000",
+  "minInvestment": "50",
+  "maxInvestment": "1000"
+}
