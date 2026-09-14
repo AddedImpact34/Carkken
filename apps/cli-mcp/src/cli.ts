@@ -5,6 +5,7 @@ import * as path from "path";
 import {
   handleTokenize,
   handleWhitelist,
+  handleMint,
   handleLaunchOffering,
   handleAgentRegister,
   handleMandateIssue,
@@ -22,7 +23,7 @@ function readJson(filePath: string) {
 
 program
   .command("tokenize")
-  .requiredOption("--file <path>", "vehicle JSON: { tokenSymbol, name, tokenizerEmail, supplyCap }")
+  .requiredOption("--file <path>", "vehicle JSON")
   .action(async (opts) => console.log(await handleTokenize(readJson(opts.file))));
 
 program
@@ -31,8 +32,13 @@ program
   .action(async (opts) => console.log(await handleWhitelist(readJson(opts.file))));
 
 program
+  .command("mint")
+  .requiredOption("--file <path>", "{ tokenSymbol, investorEmail, investorAddress, amount }")
+  .action(async (opts) => console.log(await handleMint(readJson(opts.file))));
+
+program
   .command("offering-launch")
-  .requiredOption("--file <path>", "STO settings, see docs/PROJECT_BRIEF.md")
+  .requiredOption("--file <path>", "STO settings")
   .action(async (opts) => console.log(await handleLaunchOffering(readJson(opts.file))));
 
 program
@@ -42,7 +48,7 @@ program
 
 program
   .command("mandate-issue")
-  .requiredOption("--file <path>", "mandate settings, see agent.ts Mandate type")
+  .requiredOption("--file <path>", "mandate settings")
   .action(async (opts) => console.log(await handleMandateIssue(readJson(opts.file))));
 
 program

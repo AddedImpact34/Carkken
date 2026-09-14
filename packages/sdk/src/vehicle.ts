@@ -81,3 +81,28 @@ export async function distributeDividends(
 ) {
   return client.runMethod("dividendDistribution", { signerAddress, tokenSymbol, amount });
 }
+
+export async function mintTokens(
+  client: BrickkenClient,
+  signerAddress: string,
+  params: {
+    tokenSymbol: string;
+    investorEmail: string;
+    investorAddress: string;
+    amount: string;
+    needWhitelist?: boolean;
+  }
+) {
+  return client.runMethod("mintToken", {
+    signerAddress,
+    tokenSymbol: params.tokenSymbol,
+    userToMint: [
+      {
+        investorEmail: params.investorEmail,
+        investorAddress: params.investorAddress,
+        amount: params.amount,
+        needWhitelist: params.needWhitelist ?? false,
+      },
+    ],
+  });
+}

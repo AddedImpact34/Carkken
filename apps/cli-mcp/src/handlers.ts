@@ -5,6 +5,7 @@ import {
   tokenizeVehicle,
   whitelistInvestor,
   launchLeaseOffering,
+  mintTokens,
   registerFleetAgent,
   bookAndPay,
   leaveFeedback,
@@ -12,11 +13,6 @@ import {
   checkMandate,
 } from "@carkken/sdk";
 
-/**
- * Every command lives here exactly once. cli.ts wraps these with commander
- * flags; mcp-server.ts wraps the same functions as MCP tools. Neither file
- * duplicates Brickken logic — this is the "merge CLI + MCP" point.
- */
 function client() {
   const wallet = new Wallet(process.env.PRIVATE_KEY!);
   return new BrickkenClient({
@@ -51,6 +47,16 @@ export async function handleWhitelist(args: {
   );
 }
 
+export async function handleMint(args: {
+  tokenSymbol: string;
+  investorEmail: string;
+  investorAddress: string;
+  amount: string;
+  needWhitelist?: boolean;
+}) {
+  return mintTokens(client(), process.env.SIGNER_ADDRESS!, args);
+}
+
 export async function handleLaunchOffering(args: {
   tokenizerEmail: string;
   tokenSymbol: string;
@@ -77,8 +83,6 @@ export async function handleAgentRegister(args: {
 }
 
 export async function handleMandateIssue(args: Mandate) {
-  // No Brickken endpoint confirmed yet for RAMS — validate shape locally
-  // and persist it wherever the agent process reads mandates from.
   checkMandate(args, { method: args.allowedMethods[0], amount: "0" });
   return { ok: true, mandate: args };
 }

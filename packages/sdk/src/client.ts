@@ -57,7 +57,9 @@ export class BrickkenClient {
     if (!res.ok) {
       throw new Error(`prepare-transactions failed (${res.status}): ${await res.text()}`);
     }
-    return res.json() as Promise<PreparedTx>;
+    const json = await res.json();
+    const transactions = Array.isArray(json.transactions) ? json.transactions : [json.transactions];
+    return { ...json, transactions } as PreparedTx;
   }
 
   async prepareWithPayment(
@@ -76,7 +78,9 @@ export class BrickkenClient {
     if (!res.ok) {
       throw new Error(`prepare-transactions (paid retry) failed (${res.status}): ${await res.text()}`);
     }
-    return res.json() as Promise<PreparedTx>;
+    const json = await res.json();
+    const transactions = Array.isArray(json.transactions) ? json.transactions : [json.transactions];
+    return { ...json, transactions } as PreparedTx;
   }
 
   async signAll(prepared: PreparedTx): Promise<string[]> {
