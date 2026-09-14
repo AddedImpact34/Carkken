@@ -119,8 +119,8 @@ export class BrickkenClient {
     const prepared = await this.prepare(method, body);
     const signed = await this.signAll(prepared);
     const sent = await this.send(prepared.txId, signed);
-    const status = await this.pollStatus(sent.txId);
-    return { txId: sent.txId, status, info: prepared.info };
+    const status = await this.pollStatus(prepared.txId);
+    return { txId: prepared.txId, status, info: prepared.info };
   }
 }
 
