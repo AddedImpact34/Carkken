@@ -8,10 +8,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "..", "public")));
 
 const vehicles: Vehicle[] = [
-  { tokenSymbol: "TESLA", name: "Tesla Model 3", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.OFFERING_LIVE, ratePerHour: "5" },
-  { tokenSymbol: "COROL", name: "Toyota Corolla", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.LISTED_FOR_RENT, ratePerHour: "2" },
-  { tokenSymbol: "TRANS", name: "Ford Transit", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.BOOKED, ratePerHour: "4" },
-  { tokenSymbol: "BMWX", name: "BMW X5", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.TOKENIZED, ratePerHour: "6" },
+  { tokenSymbol: "CKTSL", name: "Tesla Model 3", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.OFFERING_LIVE, ratePerHour: "5" },
+  { tokenSymbol: "CKCOR", name: "Toyota Corolla", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.LISTED_FOR_RENT, ratePerHour: "2" },
+  { tokenSymbol: "CKTRN", name: "Ford Transit", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.BOOKED, ratePerHour: "4" },
+  { tokenSymbol: "CKBMW", name: "BMW X5", tokenizerEmail: "addedimpact.org@gmail.com", supplyCap: "1000", status: VehicleStatus.TOKENIZED, ratePerHour: "6" },
 ];
 
 app.get("/vehicles", (req, res) => {
