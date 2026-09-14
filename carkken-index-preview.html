@@ -165,13 +165,24 @@ function typeFor(tokenSymbol) {
   return (VEHICLE_STYLE[tokenSymbol] || {}).type || "vehicle";
 }
 
+const SAMPLE = {
+  invest: [{ tokenSymbol: "TESLA", name: "Tesla Model 3", supplyCap: "1000", ratePerHour: "5" }],
+  rent: [{ tokenSymbol: "COROL", name: "Toyota Corolla", ratePerHour: "2" }],
+  booked: [{ tokenSymbol: "TRANS", name: "Ford Transit", ratePerHour: "4" }],
+  earnings: [{ tokenSymbol: "TESLA", dividends: [] }],
+};
 async function loadAll() {
-  const [invest, rent, booked, earnings] = await Promise.all([
-    fetch("/marketplace/invest").then(r => r.json()),
-    fetch("/marketplace/rent").then(r => r.json()),
-    fetch("/bookings/active").then(r => r.json()),
-    fetch("/fleet/performance").then(r => r.json()),
-  ]);
+  let invest, rent, booked, earnings;
+  try {
+    [invest, rent, booked, earnings] = await Promise.all([
+      fetch("/marketplace/invest").then(r => r.json()),
+      fetch("/marketplace/rent").then(r => r.json()),
+      fetch("/bookings/active").then(r => r.json()),
+      fetch("/fleet/performance").then(r => r.json()),
+    ]);
+  } catch {
+    ({ invest, rent, booked, earnings } = SAMPLE);
+  }
 
   renderRows("invest-cards", invest, "invest-bg", "No offerings open right now.", v => `
     <div class="stat"><div class="label">Token</div><div class="value mono-token">${v.tokenSymbol}</div></div>
