@@ -1,0 +1,9 @@
+{
+  "name": "Carkken Fleet Agent",
+  "description": "Autonomous agent that books rentals and settles payment for the Carkken fleet, operating within an owner-set mandate.",
+  "image": "https://images.unsplash.com/photo-1572191267337-c1705e46645c?w=400",
+  "services": [
+    {"name": "car-rental", "endpoint": "https://github.com/AddedImpact34/Carkken#booking"},
+    {"name": "payment-settlement", "endpoint": "https://github.com/AddedImpact34/Carkken#x402"}
+  ]
+}

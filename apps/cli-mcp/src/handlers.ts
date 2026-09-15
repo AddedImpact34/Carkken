@@ -6,6 +6,7 @@ import {
   whitelistInvestor,
   launchLeaseOffering,
   mintTokens,
+  approveSpender,
   registerFleetAgent,
   bookAndPay,
   leaveFeedback,
@@ -102,4 +103,12 @@ export async function handleRentBook(args: {
 
 export async function handleFeedback(args: { agentId: string; score: number; comment: string }) {
   return leaveFeedback(client(), process.env.SIGNER_ADDRESS!, args);
+}
+
+export async function handleApprove(args: {
+  tokenSymbol: string;
+  spenderAddress: string;
+  amount: string;
+}) {
+  return approveSpender(client(), process.env.SIGNER_ADDRESS!, args);
 }

@@ -88,5 +88,5 @@ export async function leaveFeedback(
   signerAddress: string,
   params: { agentId: string; score: number; comment: string }
 ) {
-  return client.runMethod("agentGiveFeedback", { signerAddress, ...params });
+  return client.runMethod("agentGiveFeedback", { signerAddress, agentId: params.agentId, value: params.score, valueDecimals: 0, comment: params.comment });
 }

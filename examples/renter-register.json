@@ -1,0 +1,6 @@
+{
+  "name": "Carkken Test Renter",
+  "description": "Test renter agent used to demonstrate a genuine two-party feedback flow.",
+  "image": "https://images.unsplash.com/photo-1559385988-439b04de16f8?w=400",
+  "services": [{"name": "vehicle-rental", "endpoint": "https://github.com/AddedImpact34/Carkken#renting"}]
+}

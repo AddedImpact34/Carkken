@@ -6,6 +6,7 @@ import {
   handleTokenize,
   handleWhitelist,
   handleMint,
+  handleApprove,
   handleLaunchOffering,
   handleAgentRegister,
   handleMandateIssue,
@@ -60,5 +61,10 @@ program
   .command("feedback")
   .requiredOption("--file <path>", "{ agentId, score, comment }")
   .action(async (opts) => console.log(await handleFeedback(readJson(opts.file))));
+
+program
+  .command("approve")
+  .requiredOption("--file <path>", "{ tokenSymbol, spenderAddress, amount }")
+  .action(async (opts) => console.log(await handleApprove(readJson(opts.file))));
 
 program.parseAsync(process.argv);

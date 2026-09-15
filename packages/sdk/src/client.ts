@@ -103,7 +103,7 @@ export class BrickkenClient {
     return res.json() as Promise<{ txId: string }>;
   }
 
-  async pollStatus(txId: string, { intervalMs = 4000, timeoutMs = 120000 } = {}) {
+  async pollStatus(txId: string, { intervalMs = 10000, timeoutMs = 60000 } = {}) {
     if (this.cfg.mock) return { status: "confirmed", txHash: fakeHash(), txId };
 
     const start = Date.now();

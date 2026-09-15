@@ -106,3 +106,12 @@ export async function mintTokens(
     ],
   });
 }
+
+/** Grants an STO/offering contract allowance to pull the tokenizer's minted supply into escrow. */
+export async function approveSpender(
+  client: BrickkenClient,
+  signerAddress: string,
+  params: { tokenSymbol: string; spenderAddress: string; amount: string }
+) {
+  return client.runMethod("approve", { signerAddress, ...params });
+}
