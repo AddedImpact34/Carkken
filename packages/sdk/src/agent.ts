@@ -1,4 +1,6 @@
+import { Wallet } from "ethers";
 import { BrickkenClient, X402PaymentRequiredError } from "./client";
+import { signX402Payment, X402Requirement } from "./x402";
 
 /**
  * RAMS (ERC-8226) mandate model.
@@ -59,7 +61,8 @@ export async function setFleetAgentWallet(
 export async function bookAndPay(
   client: BrickkenClient,
   mandate: Mandate,
-  booking: { renterAgentId: string; amount: string; method: string }
+  booking: { renterAgentId: string; amount: string; method: string },
+  payerWallet: Wallet
 ) {
   checkMandate(mandate, { method: booking.method, amount: booking.amount });
 
@@ -70,12 +73,20 @@ export async function bookAndPay(
     });
   } catch (err) {
     if (err instanceof X402PaymentRequiredError) {
-      // TODO: build the X-Payment header from err.requirements (amount,
-      // asset, chain) using the agent's x402 payer wallet, then retry via
-      // client.prepareWithPayment(). Left explicit rather than hidden so
-      // reviewers can see exactly where funds move.
-      throw new Error(
-        `x402 payment required, not yet implemented: ${JSON.stringify(err.requirements)}`
+      const requirements = err.requirements as X402Requirement[];
+      const eip3009Option = requirements.find(
+        (r) => r.extra.assetTransferMethod === "eip3009"
+      );
+      if (!eip3009Option) {
+        throw new Error(
+          `No eip3009-compatible payment option available: ${JSON.stringify(requirements)}`
+        );
+      }
+      const xPaymentHeader = await signX402Payment(payerWallet, eip3009Option);
+      return await client.prepareWithPayment(
+        booking.method,
+        { renterAgentId: booking.renterAgentId, amount: booking.amount },
+        xPaymentHeader
       );
     }
     throw err;

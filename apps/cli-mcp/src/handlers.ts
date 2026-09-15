@@ -94,11 +94,17 @@ export async function handleRentBook(args: {
   amount: string;
   method: string;
 }) {
-  return bookAndPay(client(), args.mandate, {
-    renterAgentId: args.renterAgentId,
-    amount: args.amount,
-    method: args.method,
-  });
+  const payerWallet = new Wallet(process.env.X402_PRIVATE_KEY || process.env.PRIVATE_KEY!);
+  return bookAndPay(
+    client(),
+    args.mandate,
+    {
+      renterAgentId: args.renterAgentId,
+      amount: args.amount,
+      method: args.method,
+    },
+    payerWallet
+  );
 }
 
 export async function handleFeedback(args: { agentId: string; score: number; comment: string }) {
