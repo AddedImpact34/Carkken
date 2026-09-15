@@ -34,6 +34,12 @@ reputation is built from real feedback left by distinct renter accounts.
   fleet agent
 - `get-token-info`, `get-transaction-status` — used to verify results
 
+x402 payment signing (EIP-3009 TransferWithAuthorization) is fully implemented in
+`packages/sdk/src/x402.ts` and wired into the booking flow, tested against
+real `x402Requirements` payloads returned by the sandbox. Actual settlement
+is blocked only on funding the signer wallet with testnet USDC, EURC, or
+BKN, which we are sourcing from Brickken now.
+
 Still to be resolved: `newSto` currently reverts with an unresolved custom
 error (`0xf58f733a`) after ruling out every documented field; reported to
 Brickken's `#tech-chat`, awaiting a reply. `newInvest`, `dividendDistribution`,
