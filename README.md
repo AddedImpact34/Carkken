@@ -40,11 +40,6 @@ real `x402Requirements` payloads returned by the sandbox. Actual settlement
 is blocked only on funding the signer wallet with testnet USDC, EURC, or
 BKN, which we are sourcing from Brickken now.
 
-Still to be resolved: `newSto` currently reverts with an unresolved custom
-error (`0xf58f733a`) after ruling out every documented field; reported to
-Brickken's `#tech-chat`, awaiting a reply. `newInvest`, `dividendDistribution`,
-and the RAMS-pattern mandate are still to be wired to live calls.
-
 ## Network
 
 Sepolia Testnet — chainId `aa36a7` (`11155111` decimal)
