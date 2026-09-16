@@ -142,7 +142,8 @@ export class BrickkenClient {
     } catch (err) {
       if (!(err instanceof X402PaymentRequiredError)) throw err;
 
-      const requirements = err.requirements as X402Requirement[];
+      const body = err.requirements as any;
+      const requirements: X402Requirement[] = Array.isArray(body) ? body : (body.x402Requirements || body.requirements || []);
       const eip3009Option = requirements.find((r) => r.extra.assetTransferMethod === "eip3009");
       if (!eip3009Option) {
         return { paymentRequired: true, requirements, error: "No eip3009-compatible payment option available" };
