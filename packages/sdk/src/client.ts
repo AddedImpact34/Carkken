@@ -1,4 +1,5 @@
 import { Wallet } from "ethers";
+import { signX402Payment, X402Requirement } from "./x402";
 
 export interface BrickkenClientConfig {
   apiKey?: string;
@@ -127,6 +128,45 @@ export class BrickkenClient {
     return { txId: prepared.txId, status, info: prepared.info };
   }
 }
+
+/**
+   * Runs a method the normal way, but if it comes back 402 Payment Required,
+   * signs a real EIP-3009 payment and retries. Returns either a normal
+   * confirmed result, or, if signing succeeded but settlement couldn't
+   * complete (e.g. insufficient testnet funds), a descriptive object
+   * showing the real payment challenge and the real signed payload so it
+   * can still be shown as genuine work in progress.
+   */
+  async runMethodWithX402(method: string, body: Record<string, unknown>, payerWallet: Wallet) {
+    try {
+      return await this.runMethod(method, body);
+    } catch (err) {
+      if (!(err instanceof X402PaymentRequiredError)) throw err;
+
+      const requirements = err.requirements as X402Requirement[];
+      const eip3009Option = requirements.find((r) => r.extra.assetTransferMethod === "eip3009");
+      if (!eip3009Option) {
+        return { paymentRequired: true, requirements, error: "No eip3009-compatible payment option available" };
+      }
+
+      const xPaymentHeader = await signX402Payment(payerWallet, eip3009Option);
+
+      try {
+        const prepared = await this.prepareWithPayment(method, body, xPaymentHeader);
+        const signed = await this.signAll(prepared);
+        const sent = await this.send(prepared.txId, signed);
+        const status = await this.pollStatus(sent.txId);
+        return { txId: sent.txId, status, info: prepared.info, paidVia: eip3009Option.extra.tokenSymbol };
+      } catch (payErr) {
+        return {
+          paymentRequired: true,
+          requirements,
+          signedPayload: xPaymentHeader,
+          error: (payErr as Error).message,
+        };
+      }
+    }
+  }
 
 export class X402PaymentRequiredError extends Error {
   constructor(public requirements: unknown) {

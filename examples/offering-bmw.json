@@ -1,0 +1,13 @@
+{
+  "tokenizerEmail": "addedimpact.org@gmail.com",
+  "tokenSymbol": "CKBMW",
+  "tokenAmount": "500",
+  "offeringName": "BMW X5 Series A",
+  "startDate": "2026-09-16T00:00:00.000Z",
+  "endDate": "2026-10-16T00:00:00.000Z",
+  "acceptedCoin": "USDT",
+  "minRaiseUSD": "1000",
+  "maxRaiseUSD": "10000",
+  "minInvestment": "100",
+  "maxInvestment": "2000"
+}
