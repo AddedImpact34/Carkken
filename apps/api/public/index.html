@@ -133,6 +133,20 @@
     <p class="floor-sub">What each car has paid its owners.</p>
     <div id="earnings-body"></div>
   </section>
+
+  <section class="floor">
+    <div class="floor-head">
+      <h2 class="floor-title">Live actions</h2>
+    </div>
+    <p class="floor-sub">Click any of these to trigger a real sandbox transaction right now, not a replay, a fresh one, signed and sent live.</p>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;">
+      <button class="refresh" style="background:#14213D; color:white;" onclick="runAction('register-agent', this)">Register new fleet agent</button>
+      <button class="refresh" style="background:#14213D; color:white;" onclick="runAction('give-feedback', this)">Give feedback (renter to fleet)</button>
+      <button class="refresh" style="background:#14213D; color:white;" onclick="runAction('x402-demo', this)">Attempt real x402 payment</button>
+    </div>
+    <pre id="action-log" style="background:#14213D; color:#B7F5C6; padding:20px; border-radius:14px; font-family:'IBM Plex Mono',monospace; font-size:12px; max-height:320px; overflow:auto; white-space:pre-wrap; word-break:break-all;">Click a button above to see a real transaction happen here.</pre>
+  </section>
+
 </main>
 
 <script>
@@ -215,6 +229,24 @@ function renderEarnings(earnings) {
       <span class="count">${e.dividends.length} payout(s)</span>
     </div>
   `).join("");
+}
+
+
+async function runAction(action, btn) {
+  const log = document.getElementById("action-log");
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Working...";
+  log.textContent = `> POST /actions/${action}\nWaiting for the sandbox to confirm this on Sepolia (can take up to a minute)...`;
+  try {
+    const res = await fetch(`/actions/${action}`, { method: "POST" });
+    const data = await res.json();
+    log.textContent = `> POST /actions/${action}\n\n` + JSON.stringify(data, null, 2);
+  } catch (err) {
+    log.textContent = `> POST /actions/${action}\n\nRequest failed: ${err.message}`;
+  }
+  btn.disabled = false;
+  btn.textContent = original;
 }
 
 loadAll();

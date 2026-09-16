@@ -115,3 +115,17 @@ export async function approveSpender(
 ) {
   return client.runMethod("approve", { signerAddress, ...params });
 }
+
+/** Investor puts real money into a live offering. Investor signs this one, not the tokenizer. */
+export async function investInOffering(
+  client: BrickkenClient,
+  params: {
+    tokenSymbol: string;
+    investorEmail: string;
+    investorAddress: string;
+    investmentAmount: string;
+    paymentTokenSymbol: string;
+  }
+) {
+  return client.runMethod("newInvest", { ...params });
+}

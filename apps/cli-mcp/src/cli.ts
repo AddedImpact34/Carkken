@@ -8,6 +8,7 @@ import {
   handleMint,
   handleApprove,
   handleLaunchOffering,
+  handleInvest,
   handleAgentRegister,
   handleMandateIssue,
   handleRentBook,
@@ -66,5 +67,10 @@ program
   .command("approve")
   .requiredOption("--file <path>", "{ tokenSymbol, spenderAddress, amount }")
   .action(async (opts) => console.log(await handleApprove(readJson(opts.file))));
+
+program
+  .command("invest")
+  .requiredOption("--file <path>", "{ tokenSymbol, investorEmail, investorAddress, investmentAmount, paymentTokenSymbol }")
+  .action(async (opts) => console.log(await handleInvest(readJson(opts.file))));
 
 program.parseAsync(process.argv);

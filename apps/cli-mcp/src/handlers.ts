@@ -5,6 +5,7 @@ import {
   tokenizeVehicle,
   whitelistInvestor,
   launchLeaseOffering,
+  investInOffering,
   mintTokens,
   approveSpender,
   registerFleetAgent,
@@ -117,4 +118,14 @@ export async function handleApprove(args: {
   amount: string;
 }) {
   return approveSpender(client(), process.env.SIGNER_ADDRESS!, args);
+}
+
+export async function handleInvest(args: {
+  tokenSymbol: string;
+  investorEmail: string;
+  investorAddress: string;
+  investmentAmount: string;
+  paymentTokenSymbol: string;
+}) {
+  return investInOffering(client(), args);
 }

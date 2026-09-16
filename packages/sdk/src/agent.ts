@@ -40,7 +40,7 @@ export function checkMandate(mandate: Mandate, action: { method: string; amount:
 export async function registerFleetAgent(
   client: BrickkenClient,
   signerAddress: string,
-  params: { name: string; description: string; image: string; services: string[] }
+  params: { name: string; description: string; image: string; services: { name: string; endpoint: string }[] }
 ) {
   return client.runMethod("agentRegister", { signerAddress, ...params });
 }

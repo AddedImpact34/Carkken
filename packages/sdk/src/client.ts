@@ -5,8 +5,8 @@ export interface BrickkenClientConfig {
   apiKey?: string;
   baseUrl: string;
   wallet: Wallet;
-  chainId: string; // hex, e.g. "aa36a7" for Sepolia
-  mock?: boolean; // simulate the sandbox locally, no network calls
+  chainId: string;
+  mock?: boolean;
 }
 
 export interface PreparedTx {
@@ -22,8 +22,6 @@ function fakeHash() {
 /**
  * Thin wrapper around Brickken's prepare -> sign -> send -> poll lifecycle.
  * This is the ONLY place in the codebase that talks to Brickken directly.
- * Set config.mock = true (or MOCK_MODE=true in .env) to simulate the whole
- * loop locally before a real sandbox key exists.
  */
 export class BrickkenClient {
   constructor(private cfg: BrickkenClientConfig) {}
@@ -58,6 +56,7 @@ export class BrickkenClient {
     if (!res.ok) {
       throw new Error(`prepare-transactions failed (${res.status}): ${await res.text()}`);
     }
+
     const json = await res.json();
     const transactions = Array.isArray(json.transactions) ? json.transactions : [json.transactions];
     return { ...json, transactions } as PreparedTx;
@@ -79,6 +78,7 @@ export class BrickkenClient {
     if (!res.ok) {
       throw new Error(`prepare-transactions (paid retry) failed (${res.status}): ${await res.text()}`);
     }
+
     const json = await res.json();
     const transactions = Array.isArray(json.transactions) ? json.transactions : [json.transactions];
     return { ...json, transactions } as PreparedTx;
@@ -127,9 +127,8 @@ export class BrickkenClient {
     const status = await this.pollStatus(prepared.txId);
     return { txId: prepared.txId, status, info: prepared.info };
   }
-}
 
-/**
+  /**
    * Runs a method the normal way, but if it comes back 402 Payment Required,
    * signs a real EIP-3009 payment and retries. Returns either a normal
    * confirmed result, or, if signing succeeded but settlement couldn't
@@ -155,8 +154,8 @@ export class BrickkenClient {
         const prepared = await this.prepareWithPayment(method, body, xPaymentHeader);
         const signed = await this.signAll(prepared);
         const sent = await this.send(prepared.txId, signed);
-        const status = await this.pollStatus(sent.txId);
-        return { txId: sent.txId, status, info: prepared.info, paidVia: eip3009Option.extra.tokenSymbol };
+        const status = await this.pollStatus(prepared.txId);
+        return { txId: prepared.txId, status, info: prepared.info, paidVia: eip3009Option.extra.tokenSymbol };
       } catch (payErr) {
         return {
           paymentRequired: true,
@@ -167,6 +166,7 @@ export class BrickkenClient {
       }
     }
   }
+}
 
 export class X402PaymentRequiredError extends Error {
   constructor(public requirements: unknown) {

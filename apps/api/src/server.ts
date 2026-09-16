@@ -1,7 +1,8 @@
 import "@carkken/sdk/dist/env";
 import express from "express";
 import * as path from "path";
-import { VehicleStatus, Vehicle } from "@carkken/sdk";
+import { VehicleStatus, Vehicle, BrickkenClient, registerFleetAgent, leaveFeedback } from "@carkken/sdk";
+import { Wallet } from "ethers";
 
 const app = express();
 app.use(express.json());
@@ -53,6 +54,80 @@ app.post("/vehicles/:tokenSymbol/book", (req, res) => {
   }
   vehicle.status = VehicleStatus.BOOKED;
   res.json({ ok: true, vehicle });
+});
+
+function fleetClient() {
+  return new BrickkenClient({
+    apiKey: process.env.BRICKKEN_API_KEY,
+    baseUrl: process.env.BRICKKEN_BASE_URL || "https://api.sandbox.brickken.com",
+    wallet: new Wallet(process.env.PRIVATE_KEY!),
+    chainId: process.env.CHAIN_ID || "aa36a7",
+  });
+}
+
+function renterWallet() {
+  return new Wallet(process.env.INVESTOR_PRIVATE_KEY!);
+}
+
+const FLEET_AGENT_ID = "10306";
+
+app.post("/actions/register-agent", async (_req, res) => {
+  try {
+    const stamp = Date.now();
+    const result = await registerFleetAgent(fleetClient(), process.env.SIGNER_ADDRESS!, {
+      name: `Carkken Fleet Agent ${stamp}`,
+      description: "Live demo registration triggered from the site.",
+      image: "https://images.unsplash.com/photo-1572191267337-c1705e46645c?w=400",
+      services: [{ name: "car-rental", endpoint: "https://github.com/AddedImpact34/Carkken#booking" }],
+    });
+    res.json({ ok: true, result });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: (err as Error).message });
+  }
+});
+
+app.post("/actions/give-feedback", async (_req, res) => {
+  try {
+    const client = new BrickkenClient({
+      apiKey: process.env.BRICKKEN_API_KEY,
+      baseUrl: process.env.BRICKKEN_BASE_URL || "https://api.sandbox.brickken.com",
+      wallet: renterWallet(),
+      chainId: process.env.CHAIN_ID || "aa36a7",
+    });
+    const result = await leaveFeedback(client, renterWallet().address, {
+      agentId: FLEET_AGENT_ID,
+      score: 5,
+      comment: `Live demo feedback at ${new Date().toISOString()}`,
+    });
+    res.json({ ok: true, result });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: (err as Error).message });
+  }
+});
+
+app.post("/actions/x402-demo", async (_req, res) => {
+  try {
+    const keylessClient = new BrickkenClient({
+      baseUrl: process.env.BRICKKEN_BASE_URL || "https://api.sandbox.brickken.com",
+      wallet: renterWallet(),
+      chainId: process.env.CHAIN_ID || "aa36a7",
+    });
+    const stamp = Date.now();
+    const result = await keylessClient.runMethodWithX402(
+      "agentRegister",
+      {
+        signerAddress: renterWallet().address,
+        name: `Carkken x402 Test Agent ${stamp}`,
+        description: "Registered via a real signed x402 payment, no API key used.",
+        image: "https://images.unsplash.com/photo-1559385988-439b04de16f8?w=400",
+        services: [{ name: "x402-test", endpoint: "https://github.com/AddedImpact34/Carkken#x402" }],
+      },
+      renterWallet()
+    );
+    res.json({ ok: true, result });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: (err as Error).message });
+  }
 });
 
 const port = Number(process.env.PORT) || 4000;
