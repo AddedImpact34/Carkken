@@ -85,6 +85,26 @@
 
   .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); background: var(--panel); border-radius: 14px; }
   .empty-state p { max-width: 42ch; margin: 0 auto; font-size: 14px; }
+
+  .result-card { border-radius: 14px; padding: 20px; }
+  .result-idle { background: #EEF0F3; }
+  .result-idle-text { color: var(--muted); font-size: 14px; margin: 0; }
+  .result-card.working { background: #EEF0F3; color: var(--muted); font-size: 14px; }
+  .result-card.success { background: #E1F2E9; border: 1px solid #B8E3CB; }
+  .result-card.warning { background: #FBEEDC; border: 1px solid #F0D6A8; }
+  .result-card.error { background: #FBE4DD; border: 1px solid #F2C1B0; }
+  .result-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
+  .result-badge.success { background: var(--emerald); color: white; }
+  .result-badge.warning { background: var(--amber); color: white; }
+  .result-badge.error { background: var(--coral); color: white; }
+  .result-title { font-weight: 600; font-size: 15px; margin: 0 0 4px; }
+  .result-detail { font-size: 13px; color: var(--muted); margin: 0 0 10px; }
+  .result-hash-link { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--navy); background: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; word-break: break-all; }
+  .result-hash-link:hover { text-decoration: underline; }
+  .result-raw { margin-top: 12px; }
+  .result-raw summary { font-size: 12px; color: var(--muted); cursor: pointer; }
+  .result-raw pre { font-size: 11px; background: white; padding: 12px; border-radius: 8px; overflow: auto; margin-top: 8px; white-space: pre-wrap; word-break: break-all; }
+
 </style>
 </head>
 <body>
@@ -144,7 +164,9 @@
       <button class="refresh" style="background:#14213D; color:white;" onclick="runAction('give-feedback', this)">Give feedback (renter to fleet)</button>
       <button class="refresh" style="background:#14213D; color:white;" onclick="runAction('x402-demo', this)">Attempt real x402 payment</button>
     </div>
-    <pre id="action-log" style="background:#14213D; color:#B7F5C6; padding:20px; border-radius:14px; font-family:'IBM Plex Mono',monospace; font-size:12px; max-height:320px; overflow:auto; white-space:pre-wrap; word-break:break-all;">Click a button above to see a real transaction happen here.</pre>
+    <div id="action-log" class="result-card result-idle">
+      <p class="result-idle-text">Click a button above to see a real transaction happen here.</p>
+    </div>
   </section>
 
 </main>
@@ -232,18 +254,70 @@ function renderEarnings(earnings) {
 }
 
 
+const ACTION_TITLES = {
+  "register-agent": "Fleet agent registered",
+  "give-feedback": "Feedback submitted",
+  "x402-demo": "x402 payment attempt",
+};
+
+function findTxHash(result) {
+  if (!result) return null;
+  if (result.status && result.status.transactionHash) return result.status.transactionHash;
+  return null;
+}
+
+function renderResult(action, data) {
+  const log = document.getElementById("action-log");
+  const title = ACTION_TITLES[action] || action;
+
+  if (!data.ok) {
+    log.className = "result-card error";
+    log.innerHTML = `
+      <span class="result-badge error">Failed</span>
+      <p class="result-title">${title}</p>
+      <p class="result-detail">${data.error || "Something went wrong."}</p>
+      <details class="result-raw"><summary>View raw response</summary><pre>${JSON.stringify(data, null, 2)}</pre></details>
+    `;
+    return;
+  }
+
+  const result = data.result;
+
+  if (result.paymentRequired) {
+    log.className = "result-card warning";
+    log.innerHTML = `
+      <span class="result-badge warning">Payment required</span>
+      <p class="result-title">${title}</p>
+      <p class="result-detail">Brickken issued a real x402 payment challenge and it was signed for real. Settlement is pending testnet funds: ${result.error || ""}</p>
+      <details class="result-raw"><summary>View raw response</summary><pre>${JSON.stringify(data, null, 2)}</pre></details>
+    `;
+    return;
+  }
+
+  const hash = findTxHash(result);
+  log.className = "result-card success";
+  log.innerHTML = `
+    <span class="result-badge success">Success</span>
+    <p class="result-title">${title}</p>
+    ${hash ? `<a class="result-hash-link" href="https://sepolia.etherscan.io/tx/${hash}" target="_blank" rel="noopener">${hash}</a>` : ""}
+    <details class="result-raw"><summary>View raw response</summary><pre>${JSON.stringify(data, null, 2)}</pre></details>
+  `;
+}
+
 async function runAction(action, btn) {
   const log = document.getElementById("action-log");
   const original = btn.textContent;
   btn.disabled = true;
   btn.textContent = "Working...";
-  log.textContent = `> POST /actions/${action}\nWaiting for the sandbox to confirm this on Sepolia (can take up to a minute)...`;
+  log.className = "result-card working";
+  log.innerHTML = "<p>Waiting for the sandbox to confirm this on Sepolia, can take up to a minute...</p>";
   try {
     const res = await fetch(`/actions/${action}`, { method: "POST" });
     const data = await res.json();
-    log.textContent = `> POST /actions/${action}\n\n` + JSON.stringify(data, null, 2);
+    renderResult(action, data);
   } catch (err) {
-    log.textContent = `> POST /actions/${action}\n\nRequest failed: ${err.message}`;
+    log.className = "result-card error";
+    log.innerHTML = `<span class="result-badge error">Failed</span><p class="result-detail">Request failed: ${err.message}</p>`;
   }
   btn.disabled = false;
   btn.textContent = original;
