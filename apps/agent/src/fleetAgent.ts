@@ -48,11 +48,16 @@ async function main() {
     if (request) {
       try {
         checkMandate(mandate, { method: "bookRental", amount: request.amount });
-        const result = await bookAndPay(client, mandate, {
-          renterAgentId: request.renterAgentId,
-          amount: request.amount,
-          method: request.method,
-        });
+        const result = await bookAndPay(
+          client,
+          mandate,
+          {
+            renterAgentId: request.renterAgentId,
+            amount: request.amount,
+            method: request.method,
+          },
+          wallet
+        );
         console.log("Booking settled:", result);
 
         await leaveFeedback(client, process.env.SIGNER_ADDRESS!, {
