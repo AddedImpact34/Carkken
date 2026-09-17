@@ -63,7 +63,7 @@
   .spread:last-child { margin-bottom: 0; }
   @media (max-width: 700px) { .spread { grid-template-columns: 1fr; } }
 
-  .photo { position: relative; min-height: 220px; }
+  .photo { position: relative; height: 260px; }
   .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .photo .credit {
     position: absolute; bottom: 8px; right: 10px;
@@ -271,6 +271,17 @@ function renderResult(action, data) {
   const title = ACTION_TITLES[action] || action;
 
   if (!data.ok) {
+    const isTimeout = (data.error || "").includes("Timed out waiting");
+    if (isTimeout) {
+      log.className = "result-card warning";
+      log.innerHTML = `
+        <span class="result-badge warning">Still confirming</span>
+        <p class="result-title">${title}</p>
+        <p class="result-detail">The transaction was sent and signed successfully. Sepolia is just taking longer to confirm it than we waited for, this usually lands within a minute or two. Check Etherscan for the wallet to see it land.</p>
+        <details class="result-raw"><summary>View raw response</summary><pre>${JSON.stringify(data, null, 2)}</pre></details>
+      `;
+      return;
+    }
     log.className = "result-card error";
     log.innerHTML = `
       <span class="result-badge error">Failed</span>
