@@ -59,7 +59,7 @@ server.tool(
 server.tool(
   "register_fleet_agent",
   "Register the fleet agent's on-chain identity (ERC-8004)",
-  { name: z.string(), description: z.string(), image: z.string().url(), services: z.array(z.string()) },
+  { name: z.string(), description: z.string(), image: z.string().url(), services: z.array(z.object({ name: z.string(), endpoint: z.string() })) },
   async (args) => ({ content: [{ type: "text", text: JSON.stringify(await handleAgentRegister(args)) }] })
 );
 

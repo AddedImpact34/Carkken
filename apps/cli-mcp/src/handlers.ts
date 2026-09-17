@@ -6,6 +6,7 @@ import {
   whitelistInvestor,
   launchLeaseOffering,
   investInOffering,
+  distributeDividends,
   mintTokens,
   approveSpender,
   registerFleetAgent,
@@ -79,7 +80,7 @@ export async function handleAgentRegister(args: {
   name: string;
   description: string;
   image: string;
-  services: string[];
+  services: { name: string; endpoint: string }[];
 }) {
   return registerFleetAgent(client(), process.env.SIGNER_ADDRESS!, args);
 }
@@ -128,4 +129,8 @@ export async function handleInvest(args: {
   paymentTokenSymbol: string;
 }) {
   return investInOffering(client(), args);
+}
+
+export async function handleDividend(args: { tokenSymbol: string; amount: string }) {
+  return distributeDividends(client(), process.env.SIGNER_ADDRESS!, args.tokenSymbol, args.amount);
 }
