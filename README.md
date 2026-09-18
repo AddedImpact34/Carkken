@@ -85,7 +85,7 @@ plain ERC-20 functions rather than Brickken methods.
 
 ## Reward wallet
 
-`0xF7b54D9d71646CcAda5953e5466F4BBA2d345080`
+`0xc601fC6371b85b355fFB14133cF3e7C41be091dF`
 
 ## Quickstart
 
